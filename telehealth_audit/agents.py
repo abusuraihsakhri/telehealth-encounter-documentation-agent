@@ -68,6 +68,14 @@ class TeleHealthAuditCoordinator:
         self.execution_ledger: Dict[str, Dict[str, Any]] = {}
 
     def process(self, payload: FrontierPayload) -> Dict[str, Any]:
+        # Input bounds validation
+        if len(payload.task_id) > 128:
+            raise ValueError("task_id exceeds maximum length of 128 characters")
+        if len(payload.target_identifier) > 256:
+            raise ValueError("target_identifier exceeds maximum length of 256 characters")
+        if len(payload.status_descriptor) > 64:
+            raise ValueError("status_descriptor exceeds maximum length of 64 characters")
+
         all_alerts: List[AgentTelemetryAlert] = []
         all_alerts.extend(self.sub_1.audit(payload))
         all_alerts.extend(self.sub_2.audit(payload))

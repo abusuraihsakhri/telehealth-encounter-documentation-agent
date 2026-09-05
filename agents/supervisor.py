@@ -26,6 +26,14 @@ class SystemSupervisor:
         PHIGuard.assert_no_phi(payload.target_identifier)
         PHIGuard.assert_no_phi(payload.status_descriptor)
 
+        # Input bounds validation
+        if len(payload.task_id) > 128:
+            raise ValueError("task_id exceeds maximum length of 128 characters")
+        if len(payload.target_identifier) > 256:
+            raise ValueError("target_identifier exceeds maximum length of 256 characters")
+        if len(payload.status_descriptor) > 64:
+            raise ValueError("status_descriptor exceeds maximum length of 64 characters")
+
         # Multi-worker evaluations
         all_alerts: List[AgentAlert] = []
         all_alerts.extend(self.qc_worker.evaluate(payload))

@@ -85,7 +85,10 @@ def main(argv=None):
     if args.command == "verify-audit":
         trail = AuditLogger.get_trail()
         valid = AuditLogger.verify_integrity()
-        print(f"Audit Trail Blocks: {len(trail)} | Cryptographic Integrity Verified: {valid}")
+        if not trail:
+            print("No audit records in this process; nothing to verify. Records are not persisted.")
+        else:
+            print(f"Audit Trail Blocks: {len(trail)} | Cryptographic Integrity Verified: {valid}")
         return 0
 
     if args.command == "batch":

@@ -1,5 +1,6 @@
 """Regression checks for input safety, HMAC integrity, and API behavior."""
 import pytest
+from concurrent.futures import ThreadPoolExecutor
 from pydantic import ValidationError
 from fastapi.testclient import TestClient
 
@@ -78,3 +79,17 @@ def test_second_coordinator_nonfinite_and_phi_rejected():
         coord.process(FrontierPayload("T", "SYNTHETIC", float("nan"), 1, "NOMINAL"))
     with pytest.raises(SecurityException):
         coord.process(FrontierPayload("T", "SYNTHETIC", 1, 1, "NOMINAL", attributes={"email": "not-real@example.com"}))
+
+
+def test_concurrent_audit_writes_remain_valid():
+    trail = AuditTrail(secret_key="regression-test-secret")
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        list(pool.map(lambda i: trail.log("Supervisor", "system", "TASK", {"index": i}), range(64)))
+    assert len(trail.get_trail()) == 64
+    assert trail.verify_integrity()
+
+def test_returned_log_entry_is_not_mutable_internal_state():
+    trail = AuditTrail(secret_key="regression-test-secret")
+    entry = trail.log("Supervisor", "system", "TASK", {"status": "OK"})
+    entry["actor"] = "Other"
+    assert trail.verify_integrity()

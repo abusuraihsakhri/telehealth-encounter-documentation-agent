@@ -1,7 +1,7 @@
 """
 Core Algorithmic Engine & Cryptographic / Biological Logic for TeleHealth-Audit: Virtual Care CMS Billing & Modality Compliance Agent.
 Domain: Health Policy
-Standard: CMS Telehealth Services Guidelines 2024
+Standard: Configured demonstration thresholds (not CMS policy)
 """
 import math
 from typing import Dict, Any, List, Optional
@@ -9,7 +9,7 @@ from .models import FrontierPayload, AgentTelemetryAlert, ExecutionStatus
 
 
 class FrontierDomainEngine:
-    STANDARD = "CMS Telehealth Services Guidelines 2024"
+    STANDARD = "Configured demonstration thresholds (not CMS policy)"
     PRIMARY_BOUND = 25.0
     SECONDARY_BOUND = 10.0
 
@@ -18,7 +18,7 @@ class FrontierDomainEngine:
         if value > cls.PRIMARY_BOUND:
             return {
                 "summary": "Primary Domain Boundary Deviation",
-                "details": f"Parameter value ({value:.3f}) exceeds operational threshold ({cls.PRIMARY_BOUND:.1f}) under CMS Telehealth Services Guidelines 2024.",
+                "details": f"Parameter value ({value:.3f}) exceeds operational threshold ({cls.PRIMARY_BOUND:.1f}) under Configured demonstration thresholds (not CMS policy).",
                 "remediation": "Engage parameter recalibration and algorithmic verification routine.",
             }
         return None
@@ -39,7 +39,7 @@ class FrontierDomainEngine:
         if any(flag in desc_upper for flag in ["VIOLATION", "DISCORDANT", "ANOMALY", "MUTANT", "LEAK"]):
             return {
                 "summary": "Specification / Protocol Anomaly Identified",
-                "details": f"Telemetry status flag '{descriptor}' violates CMS Telehealth Services Guidelines 2024 conformance matrix.",
+                "details": f"Telemetry status flag '{descriptor}' violates Configured demonstration thresholds (not CMS policy) conformance matrix.",
                 "remediation": "Execute automated rollback or secondary consensus verification.",
             }
         return None

@@ -1,7 +1,7 @@
 """
 Data Models & Telemetry Definitions for TeleHealth-Audit: Virtual Care CMS Billing & Modality Compliance Agent.
 Domain: Health Policy
-Standard: CMS Telehealth Services Guidelines 2024
+Standard: Configured demonstration thresholds (not CMS policy)
 """
 import datetime
 from dataclasses import dataclass, field
@@ -35,7 +35,7 @@ class AgentTelemetryAlert:
     summary: str
     technical_details: str
     actionable_remediation: str
-    standard_reference: str = "CMS Telehealth Services Guidelines 2024"
+    standard_reference: str = "Configured demonstration thresholds (not CMS policy)"
     timestamp: str = field(default_factory=lambda: datetime.datetime.now(datetime.timezone.utc).isoformat())
 
     def to_dict(self) -> Dict[str, Any]:

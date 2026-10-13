@@ -3,6 +3,9 @@ Distributed Component Coordination & Executive Hierarchy for TeleHealth-Audit: V
 Domain: Health Policy
 """
 import uuid
+import math
+import json
+from agents.base import PHIGuard
 from typing import Dict, Any, List, Optional
 from .models import FrontierPayload, AgentTelemetryAlert, ExecutionStatus
 from .engine import FrontierDomainEngine
@@ -68,6 +71,11 @@ class TeleHealthAuditCoordinator:
         self.execution_ledger: Dict[str, Dict[str, Any]] = {}
 
     def process(self, payload: FrontierPayload) -> Dict[str, Any]:
+        for value in (payload.task_id, payload.target_identifier, payload.status_descriptor,
+                      payload.timestamp, json.dumps(payload.attributes, default=str)):
+            PHIGuard.assert_no_phi(value)
+        if not math.isfinite(payload.primary_metric) or not math.isfinite(payload.secondary_metric):
+            raise ValueError("Metric values must be finite numbers")
         # Input bounds validation
         if len(payload.task_id) > 128:
             raise ValueError("task_id exceeds maximum length of 128 characters")
@@ -101,7 +109,7 @@ class TeleHealthAuditCoordinator:
             "critical_count": crit_count,
             "warning_count": warn_count,
             "alerts": [a.to_dict() for a in all_alerts],
-            "standard_specification": "CMS Telehealth Services Guidelines 2024",
+            "standard_specification": "Configured demonstration thresholds (not CMS policy)",
             "consensus_summary": f"Consensus evaluation completed across 3 sub-agents with status [{status.value}].",
         }
 
@@ -113,6 +121,6 @@ class TeleHealthAuditCoordinator:
         if "status" in q or "ledger" in q:
             return f"TeleHealth-Audit: Virtual Care CMS Billing & Modality Compliance Agent currently managing {len(self.execution_ledger)} execution tasks in air-gapped memory."
         elif "standard" in q or "spec" in q:
-            return "Active runtime operating strictly according to CMS Telehealth Services Guidelines 2024 specifications."
+            return "Active runtime operating strictly according to Configured demonstration thresholds (not CMS policy) specifications."
         else:
             return f"TeleHealth-Audit: Virtual Care CMS Billing & Modality Compliance Agent executive coordinator online. Zero-telemetry on-premises surveillance active."

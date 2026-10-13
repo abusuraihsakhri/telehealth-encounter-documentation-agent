@@ -61,7 +61,7 @@ def main(argv=None):
         dossier = coordinator.process(payload)
         print("=" * 80)
         print(f"  TELEHEALTH-AUDIT: VIRTUAL CARE CMS BILLING & MODALITY COMPLIANCE AGENT")
-        print(f"  Domain: Health Policy | Standard: CMS Telehealth Services Guidelines 2024")
+        print(f"  Domain: Health Policy | Standard: Configured demonstration thresholds")
         print(f"  Task: {dossier['task_id']} | Status: [{dossier['overall_status']}] | Total Alerts: {dossier['total_alerts']}")
         print("=" * 80)
         for a in dossier["alerts"]:

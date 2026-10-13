@@ -15,7 +15,7 @@ def create_app():
 
         app = FastAPI(
             title="TeleHealth-Audit: Virtual Care CMS Billing & Modality Compliance Agent",
-            description="Verifies synchronous audio-video requirements, patient state licensure boundaries, and appropriate CMS modifiers (GT/95/POS 02).",
+            description="Demonstrates threshold checks; does not verify CMS billing, licensure, or telehealth modality requirements.",
             version="2.0.0-FRONTIER",
         )
 

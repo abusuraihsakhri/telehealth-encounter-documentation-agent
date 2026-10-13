@@ -94,7 +94,7 @@ class AuditTrail:
                 "current_hash": signature,
             }
             self.logs.append(entry)
-            return entry
+            return entry.copy()
 
     def verify_integrity(self) -> bool:
         """Verify both the hash-chain linkage and each HMAC signature."""

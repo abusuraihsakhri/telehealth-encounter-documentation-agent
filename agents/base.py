@@ -72,7 +72,8 @@ class AuditTrail:
 
     def log(self, actor: str, actor_tier: str, event_type: str, details: Dict[str, Any]) -> Dict[str, Any]:
         payload_str = json.dumps(details, sort_keys=True)
-        assert_no_phi(payload_str)
+        for value in (actor, actor_tier, event_type, payload_str):
+            assert_no_phi(value)
         payload_hash = hashlib.sha256(payload_str.encode("utf-8")).hexdigest()
         audit_id = f"AUDIT-{int(time.time()*1000)}-{len(self.logs)+1}"
         ts = datetime.now(timezone.utc).isoformat()
@@ -93,14 +94,31 @@ class AuditTrail:
         return entry
 
     def verify_integrity(self) -> bool:
-        for i, entry in enumerate(self.logs):
-            prev = self.logs[i-1]["current_hash"] if i > 0 else "GENESIS_BLOCK_0000000000000000"
-            if entry["prev_hash"] != prev:
+        """Verify both the hash-chain linkage and each HMAC signature."""
+        previous_hash = "GENESIS_BLOCK_0000000000000000"
+        required = (
+            "audit_id", "timestamp", "actor", "actor_tier", "event_type",
+            "payload_hash", "prev_hash", "current_hash",
+        )
+        for entry in self.logs:
+            if not isinstance(entry, dict) or any(k not in entry for k in required):
                 return False
+            if entry["prev_hash"] != previous_hash:
+                return False
+            signed = "|".join(str(entry[k]) for k in required[:-1])
+            expected = hmac.new(
+                self.secret_key, signed.encode("utf-8"), hashlib.sha256
+            ).hexdigest()
+            if not isinstance(entry["current_hash"], str) or not hmac.compare_digest(
+                entry["current_hash"], expected
+            ):
+                return False
+            previous_hash = entry["current_hash"]
         return True
 
     def get_trail(self) -> List[Dict[str, Any]]:
-        return self.logs
+        """Return snapshots so API callers cannot mutate the internal ledger."""
+        return [entry.copy() for entry in self.logs]
 
 
 GLOBAL_AUDIT = AuditTrail()
